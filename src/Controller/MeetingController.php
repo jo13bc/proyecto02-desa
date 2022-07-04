@@ -6,12 +6,17 @@ require_once('src/Model/TimeBox.php');
 class MeetingController extends ControllerAPI {
 
 	protected function new(array $array) {
-		$timeBox = new TimeBox($array['start'], $array['end']);
-		$meeting = Meeting::new($array)->setProfessionalId(Auth::id());
+		$timeBox = new TimeBox(json_encode($array['start']), $array['end']);
+		$meeting = Meeting::new($array);
 		return [$meeting, $timeBox];
 	}
 
-	public function insert(): string {
+	public function insert(array $body): string {
+		$json = '';
+		foreach($body as $key => $value){
+			$json .= $key;
+		}
+		$object = json_decode($json);
 		return $this->base(
 			'Insertado con éxito',
 			function ($array) {
@@ -25,11 +30,16 @@ class MeetingController extends ControllerAPI {
 				}
 				return [$meeting, $timeBox->setId(null)];
 			},
-			['professional_id', 'date', 'description', 'start', 'end']
+			$object
 		);
 	}
 
-	public function update(array $object, int $id): string {
+	public function update(array $body, int $id): string {
+		$json = '';
+		foreach($body as $key => $value){
+			$json .= $key;
+		}
+		$object = json_decode($json);
 		return $this->base(
 			'Actualizado con éxito',
 			function ($array) use ($id) {
@@ -47,7 +57,7 @@ class MeetingController extends ControllerAPI {
 				}
 				return [$meeting->setTimeBoxId(null), $timeBox->setId(null)];
 			},
-			['professional_id', 'date', 'description', 'start', 'end', 'id']
+			$object
 		);
 	}
 
@@ -90,7 +100,13 @@ class MeetingController extends ControllerAPI {
 		return $this->base(
 			'Consultado con éxito',
 			function ($array) {
-				return Meeting::all();
+				return array_map(
+					function ($model) {
+						$timeBox = TimeBox::find((new TimeBox())->setId($model->getTimeBoxId()));
+						return [$model->setTimeBoxId(null), $timeBox];
+					},
+					Meeting::all()
+				);
 			}
 		);
 	}
@@ -99,7 +115,13 @@ class MeetingController extends ControllerAPI {
 		return $this->base(
 			'Consultado con éxito',
 			function ($array) use ($id) {
-				return Meeting::where(new Condition('professional_id', $id));
+				return array_map(
+					function ($model) {
+						$timeBox = TimeBox::find((new TimeBox())->setId($model->getTimeBoxId()));
+						return [$model->setTimeBoxId(null), $timeBox];
+					},
+					Meeting::where(new Condition('professional_id', $id))
+				);
 			}
 		);
 	}

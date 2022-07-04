@@ -4,6 +4,7 @@ $cookies = [];
 $redirect = null;
 $type = 'html';
 $accept = [];
+require_once('src/Model/Response.php');
 
 /**
  * @method static Macaw get(string $route, Callable $callback)
@@ -79,11 +80,11 @@ class Route {
         global $type;
         global $accept;
 
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Headers: Authorization, Content-Type, Accept');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+
         $content = self::_dispatch();
-		
-		header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
         foreach ($sessions as $key => $value) {
             if ($value == null && isset($_SESSION[$key]))
@@ -142,9 +143,9 @@ class Route {
         $found_route = false;
         parse_str(file_get_contents("php://input"), $_REQUEST);
 
-        if ($type == 'application/json')
+        if ($type == 'application/json') {
             $_REQUEST = json_decode(file_get_contents('php://input'), True);
-        else if ($type == 'application/xml')
+        } else if ($type == 'application/xml')
             $_REQUEST = simplexml_load_string(file_get_contents('php://input'));
 
         if (isset($_REQUEST['_method'])) {
@@ -154,10 +155,12 @@ class Route {
 
         self::$routes = preg_replace('/\/+/', '/', self::$routes);
 
-        if (in_array($uri, self::$routes)) {
+
+        if ($method === 'OPTIONS') {
+            return;
+        } else if (in_array($uri, self::$routes)) {
             $route_pos = array_keys(self::$routes, $uri);
             foreach ($route_pos as $route) {
-
                 if (
                     self::$methods[$route] == $method ||
                     self::$methods[$route] == 'ANY' ||
@@ -221,7 +224,8 @@ class Route {
             if (!self::$error_callback) {
                 self::$error_callback = function () {
                     header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found");
-                    echo '404';
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(new Response(404, 'No fue posible procesar el request.'));
                 };
             } else {
                 if (is_string(self::$error_callback)) {

@@ -106,7 +106,7 @@ class Meeting extends Model {
 	 * @param int $user_id 
 	 * @return Meeting
 	 */
-	function setUserId(int $user_id): self {
+	function setUserId(?int $user_id): self {
 		$this->user_id = $user_id;
 		return $this;
 	}

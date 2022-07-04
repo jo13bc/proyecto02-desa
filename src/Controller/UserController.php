@@ -35,40 +35,45 @@ class UserController extends ControllerAPI {
 		];
 	}
 
-	public function insert(): string {
+	public function insert(array $body): string {
+		$json = '';
+		foreach ($body as $key => $value) {
+			$json .= $key;
+		}
+		$object = json_decode($json);
 		return $this->base(
 			'Insertado con éxito',
 			function ($array) {
 				$user = User::create($array[0]);
-				if($user == null){
+				if ($user == null) {
 					throw new Exception('Ocurrió un problema al crear el usuario');
 				}
 				$monday = TimeBox::create($array[1]);
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día lunes');
 				}
 				$tuesday = TimeBox::create($array[2]);
-				if($tuesday == null){
+				if ($tuesday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día martes');
 				}
 				$wednesday = TimeBox::create($array[3]);
-				if($wednesday == null){
+				if ($wednesday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día miércoles');
 				}
 				$thursday = TimeBox::create($array[4]);
-				if($thursday == null){
+				if ($thursday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día jueves');
 				}
 				$friday = TimeBox::create($array[5]);
-				if($friday == null){
+				if ($friday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día viernes');
 				}
 				$saturday = TimeBox::create($array[6]);
-				if($saturday == null){
+				if ($saturday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día sábado');
 				}
 				$sunday = TimeBox::create($array[7]);
-				if($sunday == null){
+				if ($sunday == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de día domingo');
 				}
 				$availability = Availability::create(
@@ -83,7 +88,7 @@ class UserController extends ControllerAPI {
 						$sunday->getId()
 					)
 				);
-				if($availability == null){
+				if ($availability == null) {
 					throw new Exception('Ocurrió un problema al crear la disponibilidad de la semana');
 				}
 				return [
@@ -97,57 +102,53 @@ class UserController extends ControllerAPI {
 					$sunday->setId(null)
 				];
 			},
-			[
-				'user', 'password', 'name',
-				'start_monday', 'end_monday',
-				'start_tuesday', 'end_tuesday',
-				'start_wednday', 'end_wednday',
-				'start_thursday', 'end_thursday',
-				'start_friday', 'end_friday',
-				'start_saturday', 'end_saturday',
-				'start_sunday', 'end_sunday'
-			]
+			$object
 		);
 	}
 
-	public function update(array $object, int $id): string {
+	public function update(array $body, int $id): string {
+		$json = '';
+		foreach ($body as $key => $value) {
+			$json .= $key;
+		}
+		$object = json_decode($json);
 		return $this->base(
 			'Actualizado con éxito',
 			function ($array) use ($id) {
 				$user = User::update($array[0]->setId($id));
-				if($user == null){
+				if ($user == null) {
 					throw new Exception('Ocurrió un problema al actualizar el usuario');
 				}
 				$availability = Availability::where(new Condition('user_id', $id))[0];
-				if($availability == null){
+				if ($availability == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de la semana');
 				}
 				$monday = TimeBox::update($array[1]->setId($availability->getMonday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día lunes');
 				}
 				$tuesday = TimeBox::update($array[2]->setId($availability->getTuesday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día martes');
 				}
 				$wednesday = TimeBox::update($array[3]->setId($availability->getWednesday_time_box_id()));
-				if($wednesday == null){
+				if ($wednesday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día miércoles');
 				}
 				$thursday = TimeBox::update($array[4]->setId($availability->getThursday_time_box_id()));
-				if($thursday == null){
+				if ($thursday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día jueves');
 				}
 				$friday = TimeBox::update($array[5]->setId($availability->getFriday_time_box_id()));
-				if($friday == null){
+				if ($friday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día viernes');
 				}
 				$saturday = TimeBox::update($array[6]->setId($availability->getSaturday_time_box_id()));
-				if($saturday == null){
+				if ($saturday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día sábado');
 				}
 				$sunday = TimeBox::update($array[7]->setId($availability->getSunday_time_box_id()));
-				if($sunday == null){
+				if ($sunday == null) {
 					throw new Exception('Ocurrió un problema al actualizar la disponibilidad de día domingo');
 				}
 				return [
@@ -161,16 +162,7 @@ class UserController extends ControllerAPI {
 					$sunday->setId(null)
 				];
 			},
-			[
-				'user', 'password', 'name', 'id',
-				'start_monday', 'end_monday',
-				'start_tuesday', 'end_tuesday',
-				'start_wednesday', 'end_wednesday',
-				'start_thursday', 'end_thursday',
-				'start_friday', 'end_friday',
-				'start_saturday', 'end_saturday',
-				'start_sunday', 'end_sunday'
-			]
+			$object
 		);
 	}
 
@@ -179,39 +171,39 @@ class UserController extends ControllerAPI {
 			'Eliminado con éxito',
 			function ($array) use ($id) {
 				$user = User::destroy($array[0]->setId($id));
-				if($user == null){
+				if ($user == null) {
 					throw new Exception('Ocurrió un problema al eliminar el usuario');
 				}
 				$availability = Availability::where(new Condition('user_id', $id))[0];
-				if($availability == null){
+				if ($availability == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de la semana');
 				}
 				$monday = TimeBox::destroy($array[1]->setId($availability->getMonday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día lunes');
 				}
 				$tuesday = TimeBox::destroy($array[2]->setId($availability->getTuesday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día martes');
 				}
 				$wednesday = TimeBox::destroy($array[3]->setId($availability->getWednesday_time_box_id()));
-				if($wednesday == null){
+				if ($wednesday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día miércoles');
 				}
 				$thursday = TimeBox::destroy($array[4]->setId($availability->getThursday_time_box_id()));
-				if($thursday == null){
+				if ($thursday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día jueves');
 				}
 				$friday = TimeBox::destroy($array[5]->setId($availability->getFriday_time_box_id()));
-				if($friday == null){
+				if ($friday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día viernes');
 				}
 				$saturday = TimeBox::destroy($array[6]->setId($availability->getSaturday_time_box_id()));
-				if($saturday == null){
+				if ($saturday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día sábado');
 				}
 				$sunday = TimeBox::destroy($array[7]->setId($availability->getSunday_time_box_id()));
-				if($sunday == null){
+				if ($sunday == null) {
 					throw new Exception('Ocurrió un problema al eliminar la disponibilidad de día domingo');
 				}
 				return [
@@ -233,39 +225,39 @@ class UserController extends ControllerAPI {
 			'Encontrado con éxito',
 			function ($array) use ($id) {
 				$user = User::find($array[0]->setId($id));
-				if($user == null){
+				if ($user == null) {
 					throw new Exception('Ocurrió un problema al buscar el usuario');
 				}
 				$availability = Availability::where(new Condition('user_id', $id))[0];
-				if($availability == null){
+				if ($availability == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de la semana');
 				}
 				$monday = TimeBox::find($array[1]->setId($availability->getMonday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día lunes');
 				}
 				$tuesday = TimeBox::find($array[2]->setId($availability->getTuesday_time_box_id()));
-				if($monday == null){
+				if ($monday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día martes');
 				}
 				$wednesday = TimeBox::find($array[3]->setId($availability->getWednesday_time_box_id()));
-				if($wednesday == null){
+				if ($wednesday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día miércoles');
 				}
 				$thursday = TimeBox::find($array[4]->setId($availability->getThursday_time_box_id()));
-				if($thursday == null){
+				if ($thursday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día jueves');
 				}
 				$friday = TimeBox::find($array[5]->setId($availability->getFriday_time_box_id()));
-				if($friday == null){
+				if ($friday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día viernes');
 				}
 				$saturday = TimeBox::find($array[6]->setId($availability->getSaturday_time_box_id()));
-				if($saturday == null){
+				if ($saturday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día sábado');
 				}
 				$sunday = TimeBox::find($array[7]->setId($availability->getSunday_time_box_id()));
-				if($sunday == null){
+				if ($sunday == null) {
 					throw new Exception('Ocurrió un problema al buscar la disponibilidad de día domingo');
 				}
 				return [

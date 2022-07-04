@@ -1,12 +1,12 @@
 <?php
 
-Route::post('/login', 'LoginController@login');
-Route::get('/logout', 'LoginController@logout');
+Route::post('/proyecto02/login', 'LoginController@login');
+Route::get('/proyecto02/logout', 'LoginController@logout');
 
-Route::resource('/user', 'UserController', 'json');
-Route::get('/user/others/(:number)', 'UserController@otherUser');
-Route::resource('/meeting', 'MeetingController', 'json');
-Route::get('/meeting/user/(:number)', 'MeetingController@forUser');
+Route::resource('/proyecto02/user', 'UserController', 'json');
+Route::get('/proyecto02/user/others/(:number)', 'UserController@otherUser');
+Route::resource('/proyecto02/meeting', 'MeetingController', 'json');
+Route::get('/proyecto02/meeting/user/(:number)', 'MeetingController@forUser');
 
 Route::dispatch();
 
